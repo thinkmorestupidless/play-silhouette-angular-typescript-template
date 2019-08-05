@@ -12,7 +12,7 @@ object WebpackServer {
 
       var process: Option[scala.sys.process.Process] = None // This is really ugly, how can I do this functionally?
 
-      override def afterStarted(address: InetSocketAddress): Unit = {
+      override def afterStarted(): Unit = {
         process = if (System.getProperty("os.name").toUpperCase().indexOf("WIN") >= 0)
           Option(Process("cmd /c npm start", base).run)
         else

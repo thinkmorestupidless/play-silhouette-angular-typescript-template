@@ -38,6 +38,8 @@ class ResetPasswordController @Inject() (
   val ex: ExecutionContext)
   extends AbstractController(components) with I18nSupport {
 
+  private val log: Logger = Logger(getClass)
+
   /**
    * Resets the password.
    *
@@ -46,7 +48,7 @@ class ResetPasswordController @Inject() (
    */
   def submit(token: UUID) = silhouette.UnsecuredAction.async { implicit request =>
     authTokenService.validate(token).flatMap { maybeToken =>
-      Logger.info(s"Token returned: $maybeToken")
+      log.info(s"Token returned: $maybeToken")
       maybeToken match {
         case Some(authToken) =>
           ResetPasswordForm.form.bindFromRequest.fold(
@@ -54,7 +56,7 @@ class ResetPasswordController @Inject() (
               _.messages.mkString(", ")
             }))),
             password => userService.retrieve(authToken.userID).flatMap { maybeUser =>
-              Logger.info(s"Maybe user returned: $maybeUser")
+              log.info(s"Maybe user returned: $maybeUser")
               maybeUser match {
                 case Some(user) if user.loginInfo.providerID == CredentialsProvider.ID =>
                   val passwordInfo = passwordHasherRegistry.current.hash(password)

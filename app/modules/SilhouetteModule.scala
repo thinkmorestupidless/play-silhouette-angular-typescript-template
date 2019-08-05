@@ -19,14 +19,17 @@ import com.mohiva.play.silhouette.impl.util._
 import com.mohiva.play.silhouette.password.BCryptPasswordHasher
 import com.mohiva.play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, InMemoryAuthInfoDAO }
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
+import com.typesafe.config.Config
 import models.daos._
 import models.services.{ UserService, UserServiceImpl }
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 import net.ceedubs.ficus.readers.EnumerationReader._
+import net.ceedubs.ficus.readers.{ ArbitraryTypeReader, StringReader, ValueReader }
 import net.codingwell.scalaguice.ScalaModule
 import play.api.Configuration
 import play.api.libs.ws.WSClient
+import play.api.mvc.Cookie
 import utils.auth.DefaultEnv
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -245,7 +248,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     @Named("oauth1-token-secret-crypter") crypter: Crypter,
     configuration: Configuration,
     clock: Clock): OAuth1TokenSecretProvider = {
-
+    import CookieReader._
     val settings = configuration.underlying.as[CookieSecretSettings]("silhouette.oauth1TokenSecretProvider")
     new CookieSecretProvider(settings, signer, crypter, clock)
   }
@@ -373,3 +376,15 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     new XingProvider(httpLayer, new PlayOAuth1Service(settings), tokenSecretProvider, settings)
   }
 }
+
+trait CookieReader {
+
+  implicit def cookieValueReader: ValueReader[Cookie.SameSite] = new ValueReader[Cookie.SameSite] {
+    def read(config: Config, path: String): Cookie.SameSite = {
+      val value = config.getString(path)
+      Cookie.SameSite.parse(value).get
+    }
+  }
+}
+
+object CookieReader extends CookieReader

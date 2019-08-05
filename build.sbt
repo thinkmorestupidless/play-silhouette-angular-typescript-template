@@ -1,6 +1,7 @@
 import play.sbt.routes.RoutesKeys
-//import com.typesafe.sbt.SbtScalariform._
-//import scalariform.formatter.preferences._
+
+import com.typesafe.sbt.SbtScalariform._
+import scalariform.formatter.preferences._
 
 name := "play-silhouette-angular-typescript"
 
@@ -46,9 +47,9 @@ scalacOptions ++= Seq(
 // Scalariform settings
 //********************************************************
 
-/*defaultScalariformSettings
+scalariformAutoformat := true
 
 ScalariformKeys.preferences := ScalariformKeys.preferences.value
   .setPreference(FormatXml, false)
-  .setPreference(DoubleIndentClassDeclaration, false)
-  .setPreference(DanglingCloseParenthesis, Preserve)*/
+  .setPreference(DoubleIndentConstructorArguments, false)
+  .setPreference(DanglingCloseParenthesis, Preserve)

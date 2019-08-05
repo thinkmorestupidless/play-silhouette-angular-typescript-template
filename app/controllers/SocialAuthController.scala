@@ -38,6 +38,8 @@ class SocialAuthController @Inject() (
   cache: AsyncCacheApi)(implicit ec: ExecutionContext)
   extends AbstractController(components) with I18nSupport {
 
+  private val log: Logger = Logger(getClass)
+
   def getAuthenticationPayload(maybeBody: Option[JsValue]): JsValue = {
     maybeBody match {
       case Some(body) =>
@@ -97,10 +99,10 @@ class SocialAuthController @Inject() (
         case _ => Future.failed(new ProviderException(s"Cannot authenticate with unexpected social provider $provider"))
       }).recover {
         case e: ProviderException =>
-          Logger.error("Unexpected provider error", e)
+          log.error("Unexpected provider error", e)
           Unauthorized(Json.obj("message" -> Messages("could.not.authenticate")))
         case e: Exception =>
-          Logger.error("Unexpected error", e)
+          log.error("Unexpected error", e)
           Unauthorized(Json.obj("message" -> Messages("could.not.authenticate")))
       }
     }

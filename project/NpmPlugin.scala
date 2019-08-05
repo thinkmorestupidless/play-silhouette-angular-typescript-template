@@ -251,7 +251,7 @@ object NpmPlugin extends AutoPlugin {
     object WebpackHook extends PlayRunHook {
       var process: Option[Process] = None
 
-      override def afterStarted(addr: InetSocketAddress): Unit = {
+      override def afterStarted(): Unit = {
         logger.info(s"Starting NPM server in development mode")
         process = Some(fork(exec, base, "run" :: cmd :: Nil, logger, logLevel))
       }
